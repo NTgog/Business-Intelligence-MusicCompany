@@ -1,0 +1,1006 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1200,
+  "model": {
+    "culture": "en-US",
+    "dataSources": [
+      {
+        "name": "SqlServer ChinookDW",
+        "connectionString": "Provider=SQLOLEDB;Data Source=localhost;Initial Catalog=ChinookDW;User ID=sa;Persist Security Info=true",
+        "impersonationMode": "impersonateServiceAccount",
+        "annotations": [
+          {
+            "name": "ConnectionEditUISource",
+            "value": "SqlServer"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "name": "Bridge",
+        "columns": [
+          {
+            "name": "BridgeId",
+            "dataType": "int64",
+            "sourceColumn": "BridgeId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "TrackId",
+            "dataType": "int64",
+            "sourceColumn": "TrackId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "PlaylistId",
+            "dataType": "int64",
+            "sourceColumn": "PlaylistId",
+            "sourceProviderType": "Integer"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Bridge",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": " \t\t\t\tSELECT [dbo].[Bridge].*   FROM [dbo].[Bridge] ",
+              "dataSource": "SqlServer ChinookDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " \t\t\t\tSELECT [dbo].[Bridge].*   FROM [dbo].[Bridge] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "Bridge"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimCustomer",
+        "columns": [
+          {
+            "name": "Customer_Key",
+            "dataType": "int64",
+            "sourceColumn": "Customer_Key",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "CustomerId",
+            "dataType": "int64",
+            "sourceColumn": "CustomerId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "LastName",
+            "dataType": "string",
+            "sourceColumn": "LastName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "FirstName",
+            "dataType": "string",
+            "sourceColumn": "FirstName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Company",
+            "dataType": "string",
+            "sourceColumn": "Company",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "CustomerAddress",
+            "dataType": "string",
+            "sourceColumn": "CustomerAddress",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "City",
+            "dataType": "string",
+            "sourceColumn": "City",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "CustomerState",
+            "dataType": "string",
+            "sourceColumn": "CustomerState",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "CustomerCountry",
+            "dataType": "string",
+            "sourceColumn": "CustomerCountry",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "CustomerPostalCode",
+            "dataType": "string",
+            "sourceColumn": "CustomerPostalCode",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "CustomerPhone",
+            "dataType": "string",
+            "sourceColumn": "CustomerPhone",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "CustomerFax",
+            "dataType": "string",
+            "sourceColumn": "CustomerFax",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "CustomerEmail",
+            "dataType": "string",
+            "sourceColumn": "CustomerEmail",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "SupportedByEmployee",
+            "dataType": "int64",
+            "sourceColumn": "SupportedByEmployee",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "EmployeeFullName",
+            "dataType": "string",
+            "sourceColumn": "EmployeeFullName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "EmployeeTitle",
+            "dataType": "string",
+            "sourceColumn": "EmployeeTitle",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "ReportsTo",
+            "dataType": "int64",
+            "sourceColumn": "ReportsTo",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "RowIsCurrent",
+            "dataType": "int64",
+            "sourceColumn": "RowIsCurrent",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "RowStartDate",
+            "dataType": "string",
+            "sourceColumn": "RowStartDate",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "RowEndDate",
+            "dataType": "string",
+            "sourceColumn": "RowEndDate",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "RowChangeReason",
+            "dataType": "string",
+            "sourceColumn": "RowChangeReason",
+            "sourceProviderType": "Char"
+          },
+          {
+            "type": "calculated",
+            "name": "CustomerFullName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " DimCustomer[FirstName]&\" \"&DimCustomer[LastName]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimCustomer",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": " \t\t\t\tSELECT [dbo].[DimCustomer].*   FROM [dbo].[DimCustomer] ",
+              "dataSource": "SqlServer ChinookDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " \t\t\t\tSELECT [dbo].[DimCustomer].*   FROM [dbo].[DimCustomer] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimCustomer"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimDate",
+        "columns": [
+          {
+            "name": "DateKey",
+            "dataType": "int64",
+            "sourceColumn": "DateKey",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Date",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "FullDateUK",
+            "dataType": "string",
+            "sourceColumn": "FullDateUK",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "FullDateUSA",
+            "dataType": "string",
+            "sourceColumn": "FullDateUSA",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "DayOfMonth",
+            "dataType": "string",
+            "sourceColumn": "DayOfMonth",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "DaySuffix",
+            "dataType": "string",
+            "sourceColumn": "DaySuffix",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "DayName",
+            "dataType": "string",
+            "sourceColumn": "DayName",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "DayOfWeekUSA",
+            "dataType": "string",
+            "sourceColumn": "DayOfWeekUSA",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "DayOfWeekUK",
+            "dataType": "string",
+            "sourceColumn": "DayOfWeekUK",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "DayOfWeekInMonth",
+            "dataType": "string",
+            "sourceColumn": "DayOfWeekInMonth",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "DayOfWeekInYear",
+            "dataType": "string",
+            "sourceColumn": "DayOfWeekInYear",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "DayOfQuarter",
+            "dataType": "string",
+            "sourceColumn": "DayOfQuarter",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "DayOfYear",
+            "dataType": "string",
+            "sourceColumn": "DayOfYear",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "WeekOfMonth",
+            "dataType": "string",
+            "sourceColumn": "WeekOfMonth",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "WeekOfQuarter",
+            "dataType": "string",
+            "sourceColumn": "WeekOfQuarter",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "WeekOfYear",
+            "dataType": "string",
+            "sourceColumn": "WeekOfYear",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "Month",
+            "dataType": "string",
+            "sourceColumn": "Month",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "MonthName",
+            "dataType": "string",
+            "sourceColumn": "MonthName",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "MonthOfQuarter",
+            "dataType": "string",
+            "sourceColumn": "MonthOfQuarter",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "Quarter",
+            "dataType": "string",
+            "sourceColumn": "Quarter",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "QuarterName",
+            "dataType": "string",
+            "sourceColumn": "QuarterName",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "Year",
+            "dataType": "string",
+            "sourceColumn": "Year",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "YearName",
+            "dataType": "string",
+            "sourceColumn": "YearName",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "MonthYear",
+            "dataType": "string",
+            "sourceColumn": "MonthYear",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "MMYYYY",
+            "dataType": "string",
+            "sourceColumn": "MMYYYY",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "FirstDayOfMonth",
+            "dataType": "string",
+            "sourceColumn": "FirstDayOfMonth",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "LastDayOfMonth",
+            "dataType": "string",
+            "sourceColumn": "LastDayOfMonth",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "FirstDayOfQuarter",
+            "dataType": "string",
+            "sourceColumn": "FirstDayOfQuarter",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "LastDayOfQuarter",
+            "dataType": "string",
+            "sourceColumn": "LastDayOfQuarter",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "FirstDayOfYear",
+            "dataType": "string",
+            "sourceColumn": "FirstDayOfYear",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "LastDayOfYear",
+            "dataType": "string",
+            "sourceColumn": "LastDayOfYear",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "IsHolidayUSA",
+            "dataType": "boolean",
+            "sourceColumn": "IsHolidayUSA",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          },
+          {
+            "name": "IsWeekday",
+            "dataType": "boolean",
+            "sourceColumn": "IsWeekday",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          },
+          {
+            "name": "HolidayUSA",
+            "dataType": "string",
+            "sourceColumn": "HolidayUSA",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "IsHolidayUK",
+            "dataType": "boolean",
+            "sourceColumn": "IsHolidayUK",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          },
+          {
+            "name": "HolidayUK",
+            "dataType": "string",
+            "sourceColumn": "HolidayUK",
+            "sourceProviderType": "Char"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimDate",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": " \t\t\t\tSELECT [dbo].[DimDate].*   FROM [dbo].[DimDate] ",
+              "dataSource": "SqlServer ChinookDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " \t\t\t\tSELECT [dbo].[DimDate].*   FROM [dbo].[DimDate] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimDate"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimEmployee",
+        "columns": [
+          {
+            "name": "Employee_key",
+            "dataType": "int64",
+            "sourceColumn": "Employee_key",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "EmployeeId",
+            "dataType": "int64",
+            "sourceColumn": "EmployeeId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "LastName",
+            "dataType": "string",
+            "sourceColumn": "LastName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "FirstName",
+            "dataType": "string",
+            "sourceColumn": "FirstName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "EmployeeTitle",
+            "dataType": "string",
+            "sourceColumn": "EmployeeTitle",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "ReportsTo",
+            "dataType": "int64",
+            "sourceColumn": "ReportsTo",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "BirthDate",
+            "dataType": "dateTime",
+            "sourceColumn": "BirthDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "HireDate",
+            "dataType": "dateTime",
+            "sourceColumn": "HireDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "EmployeeAddress",
+            "dataType": "string",
+            "sourceColumn": "EmployeeAddress",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "EmployeeCity",
+            "dataType": "string",
+            "sourceColumn": "EmployeeCity",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "EmployeeState",
+            "dataType": "string",
+            "sourceColumn": "EmployeeState",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "EmployeeCountry",
+            "dataType": "string",
+            "sourceColumn": "EmployeeCountry",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Employee_PostalCode",
+            "dataType": "string",
+            "sourceColumn": "Employee_PostalCode",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Employee_Phone",
+            "dataType": "string",
+            "sourceColumn": "Employee_Phone",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Employee_Fax",
+            "dataType": "string",
+            "sourceColumn": "Employee_Fax",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Employee_Mail",
+            "dataType": "string",
+            "sourceColumn": "Employee_Mail",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "type": "calculated",
+            "name": "EmployeeFullName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "DimEmployee[FirstName]&\" \"&DimEmployee[LastName]"
+          },
+          {
+            "type": "calculated",
+            "name": "YearsInCompany",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " 2013-year(DimEmployee[HireDate])"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimEmployee",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": " \t\t\t\tSELECT [dbo].[DimEmployee].*   FROM [dbo].[DimEmployee] ",
+              "dataSource": "SqlServer ChinookDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " \t\t\t\tSELECT [dbo].[DimEmployee].*   FROM [dbo].[DimEmployee] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimEmployee"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimPlaylist",
+        "columns": [
+          {
+            "name": "PlaylistId",
+            "dataType": "int64",
+            "sourceColumn": "PlaylistId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "PlaylistName",
+            "dataType": "string",
+            "sourceColumn": "PlaylistName",
+            "sourceProviderType": "WChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimPlaylist",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": " \t\t\t\tSELECT [dbo].[DimPlaylist].*   FROM [dbo].[DimPlaylist] ",
+              "dataSource": "SqlServer ChinookDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " \t\t\t\tSELECT [dbo].[DimPlaylist].*   FROM [dbo].[DimPlaylist] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimPlaylist"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimTrack",
+        "columns": [
+          {
+            "name": "Track_Key",
+            "dataType": "int64",
+            "sourceColumn": "Track_Key",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "TrackId",
+            "dataType": "int64",
+            "sourceColumn": "TrackId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "TrackName",
+            "dataType": "string",
+            "sourceColumn": "TrackName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Composer",
+            "dataType": "string",
+            "sourceColumn": "Composer",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Milliseconds",
+            "dataType": "int64",
+            "sourceColumn": "Milliseconds",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Bytes",
+            "dataType": "int64",
+            "sourceColumn": "Bytes",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "UnitPrice",
+            "dataType": "double",
+            "sourceColumn": "UnitPrice",
+            "sourceProviderType": "Numeric"
+          },
+          {
+            "name": "AlbumId",
+            "dataType": "int64",
+            "sourceColumn": "AlbumId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "AlbumTitle",
+            "dataType": "string",
+            "sourceColumn": "AlbumTitle",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Artist_Id",
+            "dataType": "int64",
+            "sourceColumn": "Artist_Id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "ArtistName",
+            "dataType": "string",
+            "sourceColumn": "ArtistName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "MediaTypeId",
+            "dataType": "int64",
+            "sourceColumn": "MediaTypeId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "MediaTypeName",
+            "dataType": "string",
+            "sourceColumn": "MediaTypeName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "GenreId",
+            "dataType": "int64",
+            "sourceColumn": "GenreId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "GenreName",
+            "dataType": "string",
+            "sourceColumn": "GenreName",
+            "sourceProviderType": "WChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimTrack",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": " \t\t\t\tSELECT [dbo].[DimTrack].*   FROM [dbo].[DimTrack] ",
+              "dataSource": "SqlServer ChinookDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " \t\t\t\tSELECT [dbo].[DimTrack].*   FROM [dbo].[DimTrack] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimTrack"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "FactInvoiceLine",
+        "columns": [
+          {
+            "name": "Date_Key",
+            "dataType": "int64",
+            "sourceColumn": "Date_Key",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Track_Key",
+            "dataType": "int64",
+            "sourceColumn": "Track_Key",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Employee_Key",
+            "dataType": "int64",
+            "sourceColumn": "Employee_Key",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Customer_Key",
+            "dataType": "int64",
+            "sourceColumn": "Customer_Key",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "InvoiceLine_Id",
+            "dataType": "int64",
+            "sourceColumn": "InvoiceLine_Id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Invoice_Id",
+            "dataType": "int64",
+            "sourceColumn": "Invoice_Id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "TrackId",
+            "dataType": "int64",
+            "sourceColumn": "TrackId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Quantity",
+            "dataType": "int64",
+            "sourceColumn": "Quantity",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "UnitPrice",
+            "dataType": "double",
+            "sourceColumn": "UnitPrice",
+            "sourceProviderType": "Numeric"
+          },
+          {
+            "name": "CustomerId",
+            "dataType": "int64",
+            "sourceColumn": "CustomerId",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "InvoiceDate",
+            "dataType": "dateTime",
+            "sourceColumn": "InvoiceDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "BillingAddress",
+            "dataType": "string",
+            "sourceColumn": "BillingAddress",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "BillingCity",
+            "dataType": "string",
+            "sourceColumn": "BillingCity",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "BillingState",
+            "dataType": "string",
+            "sourceColumn": "BillingState",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "BillingCountry",
+            "dataType": "string",
+            "sourceColumn": "BillingCountry",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "BillingPostalCode",
+            "dataType": "string",
+            "sourceColumn": "BillingPostalCode",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Total",
+            "dataType": "double",
+            "sourceColumn": "Total",
+            "sourceProviderType": "Numeric"
+          },
+          {
+            "type": "calculated",
+            "name": "AmountPerSale",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": " ROUND(FactInvoiceLine[Quantity]*FactInvoiceLine[UnitPrice], 2)"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "FactInvoiceLine",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": " \t\t\t\tSELECT [dbo].[FactInvoiceLine].*   FROM [dbo].[FactInvoiceLine] ",
+              "dataSource": "SqlServer ChinookDW"
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "OverallAmount",
+            "expression": " SUM(FactInvoiceLine[AmountPerSale])"
+          },
+          {
+            "name": "OverallAmount2013",
+            "expression": [
+              " ",
+              "Calculate(SUM(FactInvoiceLine[AmountPerSale]),",
+              "        FILTER(FactInvoiceLine, YEAR(FactInvoiceLine[InvoiceDate]) = 2013)",
+              "    )"
+            ]
+          },
+          {
+            "name": "OverallAmount2012",
+            "expression": [
+              " ",
+              "Calculate(SUM(FactInvoiceLine[AmountPerSale]),",
+              "        FILTER(FactInvoiceLine, YEAR(FactInvoiceLine[InvoiceDate]) = 2012)",
+              "    )"
+            ]
+          },
+          {
+            "name": "2013_vs_2012_Difference",
+            "expression": "[OverallAmount2013]-[OverallAmount2012]"
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " \t\t\t\tSELECT [dbo].[FactInvoiceLine].*   FROM [dbo].[FactInvoiceLine] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "FactInvoiceLine"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "67aface6-e3e8-44d4-8255-0e31161a9e40",
+        "fromTable": "Bridge",
+        "fromColumn": "PlaylistId",
+        "toTable": "DimPlaylist",
+        "toColumn": "PlaylistId"
+      },
+      {
+        "name": "1ba98e1f-eb05-4cb4-ab5e-2fbe2222b289",
+        "fromTable": "Bridge",
+        "fromColumn": "TrackId",
+        "toTable": "DimTrack",
+        "toColumn": "Track_Key"
+      },
+      {
+        "name": "a302b589-cf69-425c-bb25-9502eb9a7921",
+        "fromTable": "FactInvoiceLine",
+        "fromColumn": "Customer_Key",
+        "toTable": "DimCustomer",
+        "toColumn": "Customer_Key"
+      },
+      {
+        "name": "1aea48f3-d841-4b12-97dd-5682a177c032",
+        "fromTable": "FactInvoiceLine",
+        "fromColumn": "Date_Key",
+        "toTable": "DimDate",
+        "toColumn": "DateKey"
+      },
+      {
+        "name": "49b698a5-b554-4685-ba39-b948c4b4f48b",
+        "fromTable": "FactInvoiceLine",
+        "fromColumn": "Employee_Key",
+        "toTable": "DimEmployee",
+        "toColumn": "Employee_key"
+      },
+      {
+        "name": "29054cfc-63fd-4b0d-bd65-fababc896f2d",
+        "fromTable": "FactInvoiceLine",
+        "fromColumn": "Track_Key",
+        "toTable": "DimTrack",
+        "toColumn": "Track_Key"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "400"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}
