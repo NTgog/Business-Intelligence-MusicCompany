@@ -25,6 +25,7 @@ The SSAS folder includes DAX measures created through SQL Server Analysis Servic
 - **PowerBI_Final.pbix:** Power BI data analysis file.
 - **Executive Summary.pdf:** Executive summary document in PDF format.
 - **Presentation Project_Future.ppt:** PowerPoint presentation of the 5-member team.
+- **Two .bak files** One .bak file for the OLTP database named Chinook and one for the DataWarehouse (DW) named ChinookDW
 
 ## Project Context
 
