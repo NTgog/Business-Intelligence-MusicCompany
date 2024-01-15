@@ -1,0 +1,276 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="1/9/2024 1:24:38 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="DESKTOP-9S55D15"
+  DTS:CreatorName="DESKTOP-9S55D15\Eugenia"
+  DTS:DTSID="{D3899F68-95D3-4C59-8172-955CC1F08D4A}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="16.0.5314.0"
+  DTS:LocaleID="1033"
+  DTS:ObjectName="ETL"
+  DTS:PackageType="5"
+  DTS:VersionBuild="24"
+  DTS:VersionGUID="{ACBD4767-3C3A-482F-9E64-FCF4E20AD2B3}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Constraints"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{9f9b42dd-f6c0-4891-a143-b6e8bd0becbf}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Constraints"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2022; © 2022 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{E6FF6A1A-AE3E-4FA4-83E1-ECD94A6BDE65}"
+          SQLTask:SqlStatementSource="&#xA;&#xA;USE ChinookDW&#xA;GO&#xA;&#xA;-----------------------------------------------------------------------------------------------&#xA;-- Creating the relationships among the fact table and the Dimensions. We want a STAR schema. &#xA;&#xA;ALTER TABLE FactInvoiceLine ADD constraint [FactInvoiceLineDate] FOREIGN KEY (Date_Key)&#xA;    REFERENCES DimDate(DateKey);&#xA;&#xA;ALTER TABLE FactInvoiceLine ADD constraint [FactInvoiceLineTrack] FOREIGN KEY (Track_Key)&#xA;    REFERENCES DimTrack (Track_Key);&#xA;&#xA;ALTER TABLE FactInvoiceLine ADD constraint [FactInvoiceLineEmployee] FOREIGN KEY (Employee_Key)&#xA;    REFERENCES DimEmployee (Employee_Key);&#xA;&#xA;ALTER TABLE FactInvoiceLine ADD constraint [FactInvoiceLineCustomer] FOREIGN KEY (Customer_Key)&#xA;    REFERENCES DimCustomer (Customer_Key);&#xA;&#xA;--ALTER TABLE FactInvoiceLine ADD constraint [FactInvoiceLinePlaylist] FOREIGN KEY (Playlist_Key)&#xA;--    REFERENCES DimPlaylist (Playlist_Key);&#xA;&#xA;&#xA;------------------------------------------------------------------------------------------------------------------&#xA;-- Creating the relations between DimPlaylist and DimTrack tables by using an intermediate table named Bridge.&#xA;&#xA;-- Add foreign key constraint for DimTrack&#xA;ALTER TABLE Bridge&#xA;ADD CONSTRAINT FK_Bridge_DimTrack&#xA;FOREIGN KEY (TrackId)&#xA;REFERENCES DimTrack (Track_Key);&#xA;&#xA;-- Add foreign key constraint for DimPlaylist&#xA;ALTER TABLE Bridge&#xA;ADD CONSTRAINT FK_Bridge_DimPlaylist&#xA;FOREIGN KEY (PlaylistId)&#xA;REFERENCES DimPlaylist (PlaylistId);&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Data Warehouse"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{0bebce3b-e453-4e87-8d35-6513c16761d3}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Data Warehouse"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2022; © 2022 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{E6FF6A1A-AE3E-4FA4-83E1-ECD94A6BDE65}"
+          SQLTask:SqlStatementSource="&#xA;&#xA;IF EXISTS (SELECT name FROM sys.databases WHERE name = 'ChinookDW')&#xA;BEGIN&#xA;    DROP DATABASE ChinookDW;&#xA;END&#xA;&#xA;&#xA;CREATE DATABASE ChinookDW&#xA;GO&#xA;&#xA;USE ChinookDW&#xA;GO&#xA;&#xA;DROP TABLE IF EXISTS Bridge;&#xA;DROP TABLE IF EXISTS dimTrack;&#xA;DROP TABLE IF EXISTS dimEmployee;&#xA;DROP TABLE IF EXISTS dimPlaylist;&#xA;DROP TABLE IF EXISTS dimCustomer;&#xA;DROP TABLE IF EXISTs dimInvoice;&#xA;DROP TABLE IF EXISTS FactInvoiceLine;&#xA;&#xA;&#xA;------------------------------------------------------------------------------------------------------------------------------------------------------&#xA;------------------------------------------------------ Dimension Track Creation ----------------------------------------------------------------------&#xA;---- dimTrack dimension will need to include:&#xA;CREATE TABLE DimTrack (&#xA;&#x9;Track_Key INT IDENTITY(1,1) NOT NULL PRIMARY KEY, -- New PK&#xA;    TrackId INT NOT NULL ,&#xA;    TrackName NVARCHAR(200) NOT NULL,&#xA;&#x9;Composer NVARCHAR(220) NULL,&#xA;&#x9;Milliseconds INT NULL,&#xA;&#x9;Bytes INT NULL,&#xA;&#x9;UnitPrice NUMERIC(10,2) NOT NULL,&#xA;&#x9;AlbumId INT NULL,&#xA;&#x9;AlbumTitle NVARCHAR(160) NOT NULL,&#xA;&#x9;Artist_Id INT NOT NULL,&#xA;&#x9;ArtistName NVARCHAR(120) NULL,&#xA;&#x9;MediaTypeId INT NULL,&#xA;&#x9;MediaTypeName NVARCHAR(120) NULL,&#xA;&#x9;GenreId INT NULL,&#xA;&#x9;GenreName NVARCHAR(120) NULL&#xA;&#xA;);&#xA;&#xA;----------------------------------------------------------------------------------------------------------------------------------------------------------&#xA;------------------------------------------------------- Dimension Playlist Creation ----------------------------------------------------------------------&#xA;-- We added 4 new attributes (RowIsCurrent, RowStartDate, RowEndDate, RowChangeReason) that we are going need for the SCD type 2 implementation later.&#xA;CREATE TABLE DimPlaylist (&#xA;&#x9;-- Playlist_Key INT IDENTITY(1,1) NOT NULL PRIMARY KEY, -- New PK&#xA;    PlaylistId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,&#xA;&#x9;PlaylistName NVARCHAR(120) NULL&#xA;);&#xA;&#xA;&#xA;------------------------------------------------------------------------------------------------------------------------------------------------------&#xA;------------------------------------------------------ Bridge PlaylistTrack Creation -----------------------------------------------------------------&#xA;---- dimTrack dimension will need to include:&#xA;&#xA;CREATE TABLE Bridge (&#xA;    BridgeId INT IDENTITY(1,1) NOT NULL PRIMARY KEY, -- ADD PK&#xA;    TrackId INT NOT NULL,&#xA;    PlaylistId INT NOT NULL&#xA;);&#xA;&#xA;&#xA;----------------------------------------------------------------------------------------------------------------------------------------------------------&#xA;------------------------------------------------------- Dimension Customer Creation ----------------------------------------------------------------------&#xA;-- We added 4 new attributes (RowIsCurrent, RowStartDate, RowEndDate, RowChangeReason) that we are going need for the SCD type 2 implementation later.&#xA;&#xA;CREATE TABLE DimCustomer(&#xA;&#x9;Customer_Key INT IDENTITY(1,1) NOT NULL PRIMARY KEY,  -- New PK&#xA;&#x9;CustomerId INT NOT NULL,&#xA;&#x9;LastName NVARCHAR(20) NOT NULL,&#xA;&#x9;FirstName NVARCHAR(40) NOT NULL,&#xA;&#x9;Company NVARCHAR(80) NULL,&#xA;&#x9;CustomerAddress NVARCHAR(70) NULL,&#xA;&#x9;City NVARCHAR(40) NULL,&#xA;&#x9;CustomerState NVARCHAR(40) NULL,&#xA;&#x9;CustomerCountry NVARCHAR(40) NULL,&#xA;&#x9;CustomerPostalCode NVARCHAR(10) NULL,&#xA;&#x9;CustomerPhone NVARCHAR(24) NULL,&#xA;&#x9;CustomerFax NVARCHAR(24) NULL,&#xA;&#x9;CustomerEmail NVARCHAR(60) NOT NULL,&#xA;&#x9;SupportedByEmployee INT NULL,&#xA;&#x9;EmployeeFullName NVARCHAR(41) NOT NULL,&#xA;&#x9;EmployeeTitle NVARCHAR(30) NULL,&#xA;&#x9;ReportsTo INT NULL,&#xA;&#x9;------------------------------------------------&#xA;&#x9;RowIsCurrent INT DEFAULT 1 NOT NULL,&#xA;&#x9;RowStartDate DATE DEFAULT '1899-12-31' NOT NULL,&#xA;&#x9;RowEndDate DATE DEFAULT '9999-12-31' NOT NULL,&#xA;&#x9;RowChangeReason VARCHAR(200) NULL&#xA;);&#xA;&#xA;&#xA;-------------------------------------------------------------------------------------------------------------------------------------------------------------&#xA;------------------------------------------------------------ Dimension Employee Creation --------------------------------------------------------------------&#xA;CREATE TABLE DimEmployee(&#xA;&#x9;Employee_key INT IDENTITY(1,1) NOT NULL PRIMARY KEY,  -- New PK&#xA;&#x9;EmployeeId INT NULL,&#xA;&#x9;LastName NVARCHAR(20) NOT NULL,&#xA;&#x9;FirstName NVARCHAR(20) NOT NULL,&#xA;&#x9;EmployeeTitle NVARCHAR(30) NULL,&#xA;&#x9;ReportsTo INT NULL,&#xA;&#x9;BirthDate datetime NULL,&#xA;&#x9;HireDate datetime NULL,&#xA;&#x9;EmployeeAddress NVARCHAR(70) NULL,&#xA;&#x9;EmployeeCity NVARCHAR(40) NULL,&#xA;&#x9;EmployeeState NVARCHAR(40) NULL,&#xA;&#x9;EmployeeCountry NVARCHAR(40) NULL,&#xA;&#x9;Employee_PostalCode NVARCHAR(10) NULL,&#xA;&#x9;Employee_Phone NVARCHAR(24) NULL,&#xA;&#x9;Employee_Fax NVARCHAR(24) NULL,&#xA;&#x9;Employee_Mail NVARCHAR(60) NULL&#xA;&#x9;);&#xA;&#xA;&#xA;-------------------------------------------------------------------------------------------------------------------------------------------------------------&#xA;------------------------------------------------------------ FACT InvoiceLine Creation ----------------------------------------------------------------------&#xA;CREATE TABLE FactInvoiceLine(&#xA;&#x9;Date_Key INT NOT NULL,&#xA;    Track_Key INT NOT NULL,&#xA;&#x9;-- Playlist_Key INT NOT NULL,&#xA;&#x9;Employee_Key INT NOT NULL,&#xA;&#x9;Customer_Key INT NOT NULL,&#xA;&#x9;-----------------------------------&#xA;    InvoiceLine_Id INT NOT NULL,&#xA;    Invoice_Id INT NOT NULL,&#xA;&#x9;TrackId INT NULL,&#xA;    Quantity INT NOT NULL,&#xA;&#x9;UnitPrice NUMERIC(10,2) NOT NULL,&#xA;&#x9;-----------------------------------&#xA;&#x9;CustomerId INT NOT NULL,&#xA;&#x9;InvoiceDate datetime NOT NULL,&#xA;&#x9;BillingAddress NVARCHAR(70) NULL,&#xA;&#x9;BillingCity NVARCHAR(40) NULL,&#xA;&#x9;BillingState NVARCHAR(40) NULL,&#xA;&#x9;BillingCountry NVARCHAR(40) NULL,&#xA;&#x9;BillingPostalCode NVARCHAR(10) NULL,&#xA;&#x9;Total NUMERIC(10,2) NOT NULL,&#xA;&#xA;);&#xA;&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Date Dimension"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{9aaf77db-fde5-4006-9f8f-9a9388d704e8}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Date Dimension"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2022; © 2022 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{E6FF6A1A-AE3E-4FA4-83E1-ECD94A6BDE65}"
+          SQLTask:SqlStatementSource="--Creating the date dimension as a TABLE in MSSQL&#xA;--Provides the UK and USA holidays&#xA;--Specify Start Date and End date here&#xA;--Value of Start Date Must be Less than Your End Date&#xA;&#xA;USE ChinookDW&#xA;GO&#xA;&#xA;&#xA;DECLARE @StartDate DATETIME = '2009-01-01' --Starting value of Date Range&#xA;DECLARE @EndDate DATETIME = '2013-12-31' --End Value of Date Range&#xA;&#xA;--SELECT DATEPART(QQ  , Getdate()) as DayOfMonthValue&#xA;--SELECT CONVERT (char(8),Getdate(),112)&#xA;&#xA;--DATEPART(DW, @CurrentDate)&#xA;--SELECT CONVERT (char(10),Getdate(),103)&#xA;--SELECT DATENAME(DW, '16-aug-2013') AS DayName&#xA;--SELECT DATEPART(DW, '16-aug-2013') AS DayNumber&#xA;&#xA;--SELECT DATEPART(WW, '16-aug-2013') AS WeekOfYear&#xA;&#xA;DROP TABLE IF EXISTS [dbo].[DimDate]&#xA;&#xA;/**********************************************************************************/&#xA;&#xA;CREATE TABLE [dbo].[DimDate]&#xA;    ([DateKey] INT primary key,&#xA;        [Date] DATETIME,&#xA;        [FullDateUK] CHAR(10), -- Date in dd-MM-yyyy format&#xA;        [FullDateUSA] CHAR(10),-- Date in MM-dd-yyyy format&#xA;        [DayOfMonth] VARCHAR(2), -- Field will hold day number of Month&#xA;        [DaySuffix] VARCHAR(4), -- Apply suffix as 1st, 2nd ,3rd etc&#xA;        [DayName] VARCHAR(9), -- Contains name of the day, Sunday, Monday&#xA;        [DayOfWeekUSA] CHAR(1),-- First Day Sunday=1 and Saturday=7&#xA;        [DayOfWeekUK] CHAR(1),-- First Day Monday=1 and Sunday=7&#xA;        [DayOfWeekInMonth] VARCHAR(2), --1st Monday or 2nd Monday in Month&#xA;        [DayOfWeekInYear] VARCHAR(2),&#xA;        [DayOfQuarter] VARCHAR(3),&#xA;        [DayOfYear] VARCHAR(3),&#xA;        [WeekOfMonth] VARCHAR(1),-- Week Number of Month&#xA;        [WeekOfQuarter] VARCHAR(2), --Week Number of the Quarter&#xA;        [WeekOfYear] VARCHAR(2),--Week Number of the Year&#xA;        [Month] VARCHAR(2), --Number of the Month 1 to 12&#xA;        [MonthName] VARCHAR(9),--January, February etc&#xA;        [MonthOfQuarter] VARCHAR(2),-- Month Number belongs to Quarter&#xA;        [Quarter] CHAR(1),&#xA;        [QuarterName] VARCHAR(9),--First,Second..&#xA;        [Year] CHAR(4),-- Year value of Date stored in Row&#xA;        [YearName] CHAR(7), --CY 2012,CY 2013&#xA;        [MonthYear] CHAR(10), --Jan-2013,Feb-2013&#xA;        [MMYYYY] CHAR(6),&#xA;        [FirstDayOfMonth] DATE,&#xA;        [LastDayOfMonth] DATE,&#xA;        [FirstDayOfQuarter] DATE,&#xA;        [LastDayOfQuarter] DATE,&#xA;        [FirstDayOfYear] DATE,&#xA;        [LastDayOfYear] DATE,&#xA;        [IsHolidayUSA] BIT,-- Flag 1=National Holiday, 0-No National Holiday&#xA;        [IsWeekday] BIT,-- 0=Week End ,1=Week Day&#xA;        [HolidayUSA] VARCHAR(50),--Name of Holiday in US&#xA;        [IsHolidayUK] BIT Null, -- Flag 1=National Holiday, 0-No National Holiday&#xA;        [HolidayUK] VARCHAR(50) Null --Name of Holiday in UK&#xA;    )&#xA;;&#xA;&#xA;&#xA;/********************************************************************************************/&#xA;&#xA;&#xA;--Temporary Variables To Hold the Values During Processing of Each Date of Year&#xA;DECLARE&#xA;    @DayOfWeekInMonth INT,&#xA;    @DayOfWeekInYear INT,&#xA;    @DayOfQuarter INT,&#xA;    @WeekOfMonth INT,&#xA;    @CurrentYear INT,&#xA;    @CurrentMonth INT,&#xA;    @CurrentQuarter INT&#xA;&#xA;/*TABLE Data type to store the day of week count for the month and year*/&#xA;DECLARE @DayOfWeek TABLE (DOW INT, MonthCount INT, QuarterCount INT, YearCount INT)&#xA;&#xA;INSERT INTO @DayOfWeek VALUES (1, 0, 0, 0)&#xA;INSERT INTO @DayOfWeek VALUES (2, 0, 0, 0)&#xA;INSERT INTO @DayOfWeek VALUES (3, 0, 0, 0)&#xA;INSERT INTO @DayOfWeek VALUES (4, 0, 0, 0)&#xA;INSERT INTO @DayOfWeek VALUES (5, 0, 0, 0)&#xA;INSERT INTO @DayOfWeek VALUES (6, 0, 0, 0)&#xA;INSERT INTO @DayOfWeek VALUES (7, 0, 0, 0)&#xA;&#xA;--Extract and assign part of Values FROM Current Date to Variable&#xA;&#xA;DECLARE @CurrentDate AS DATETIME = @StartDate&#xA;SET @CurrentMonth = DATEPART(MM, @CurrentDate)&#xA;SET @CurrentYear = DATEPART(YY, @CurrentDate)&#xA;SET @CurrentQuarter = DATEPART(QQ, @CurrentDate)&#xA;&#xA;/********************************************************************************************/&#xA;--Proceed only if Start Date(Current date) is less than End date you specified above&#xA;&#xA;WHILE @CurrentDate &lt;= @EndDate&#xA;BEGIN&#xA;&#xA;/*Begin day of week logic*/&#xA;&#xA;         /*Check for Change in Month of the Current date if Month changed then&#xA;          Change variable value*/&#xA;    IF @CurrentMonth != DATEPART(MM, @CurrentDate)&#xA;    BEGIN&#xA;        UPDATE @DayOfWeek&#xA;        SET MonthCount = 0&#xA;        SET @CurrentMonth = DATEPART(MM, @CurrentDate)&#xA;    END&#xA;&#xA;        --&#xA;        /* Check for Change in Quarter of the Current date if Quarter changed then change&#xA;         Variable value*/&#xA;&#xA;    IF @CurrentQuarter != DATEPART(QQ, @CurrentDate)&#xA;    BEGIN&#xA;        UPDATE @DayOfWeek&#xA;        SET QuarterCount = 0&#xA;        SET @CurrentQuarter = DATEPART(QQ, @CurrentDate)&#xA;    END&#xA;&#xA;        /* Check for Change in Year of the Current date if Year changed then change&#xA;         Variable value*/&#xA;&#xA;&#xA;    IF @CurrentYear != DATEPART(YY, @CurrentDate)&#xA;    BEGIN&#xA;        UPDATE @DayOfWeek&#xA;        SET YearCount = 0&#xA;        SET @CurrentYear = DATEPART(YY, @CurrentDate)&#xA;    END&#xA;&#xA;        -- Set values in TABLE data type created above FROM variables&#xA;&#xA;    UPDATE @DayOfWeek&#xA;    SET&#xA;        MonthCount = MonthCount + 1,&#xA;        QuarterCount = QuarterCount + 1,&#xA;        YearCount = YearCount + 1&#xA;    WHERE DOW = DATEPART(DW, @CurrentDate)&#xA;&#xA;    SELECT&#xA;        @DayOfWeekInMonth = MonthCount,&#xA;        @DayOfQuarter = QuarterCount,&#xA;        @DayOfWeekInYear = YearCount&#xA;    FROM @DayOfWeek&#xA;    WHERE DOW = DATEPART(DW, @CurrentDate)&#xA;&#xA;/*End day of week logic*/&#xA;&#xA;&#xA;/* Populate Your Dimension TABLE with values*/&#xA;&#xA;    INSERT INTO [dbo].[DimDate]&#xA;    SELECT&#xA;&#xA;        CONVERT (char(8),@CurrentDate,112) as DateKey,&#xA;        @CurrentDate AS Date,&#xA;        CONVERT (char(10),@CurrentDate,103) as FullDateUK,&#xA;        CONVERT (char(10),@CurrentDate,101) as FullDateUSA,&#xA;        DATEPART(DD, @CurrentDate) AS DayOfMonth,&#xA;        --Apply Suffix values like 1st, 2nd 3rd etc..&#xA;        CASE&#xA;            WHEN DATEPART(DD,@CurrentDate) IN (11,12,13) THEN CAST(DATEPART(DD,@CurrentDate) AS VARCHAR) + 'th'&#xA;            WHEN RIGHT(DATEPART(DD,@CurrentDate),1) = 1 THEN CAST(DATEPART(DD,@CurrentDate) AS VARCHAR) + 'st'&#xA;            WHEN RIGHT(DATEPART(DD,@CurrentDate),1) = 2 THEN CAST(DATEPART(DD,@CurrentDate) AS VARCHAR) + 'nd'&#xA;            WHEN RIGHT(DATEPART(DD,@CurrentDate),1) = 3 THEN CAST(DATEPART(DD,@CurrentDate) AS VARCHAR) + 'rd'&#xA;            ELSE CAST(DATEPART(DD,@CurrentDate) AS VARCHAR) + 'th'&#xA;            END AS DaySuffix,&#xA;&#xA;        DATENAME(DW, @CurrentDate) AS DayName,&#xA;        DATEPART(DW, @CurrentDate) AS DayOfWeekUSA,&#xA;        -- check for day of week as Per US and change it as per UK format&#xA;        CASE DATEPART(DW, @CurrentDate)&#xA;            WHEN 1 THEN 7&#xA;            WHEN 2 THEN 1&#xA;            WHEN 3 THEN 2&#xA;            WHEN 4 THEN 3&#xA;            WHEN 5 THEN 4&#xA;            WHEN 6 THEN 5&#xA;            WHEN 7 THEN 6&#xA;            END&#xA;            AS DayOfWeekUK,&#xA;&#xA;        @DayOfWeekInMonth AS DayOfWeekInMonth,&#xA;        @DayOfWeekInYear AS DayOfWeekInYear,&#xA;        @DayOfQuarter AS DayOfQuarter,&#xA;        DATEPART(DY, @CurrentDate) AS DayOfYear,&#xA;        DATEPART(WW, @CurrentDate) + 1 - DATEPART(WW, CONVERT(VARCHAR, DATEPART(MM, @CurrentDate)) + '/1/' + CONVERT(VARCHAR, DATEPART(YY, @CurrentDate))) AS WeekOfMonth,&#xA;        (DATEDIFF(DD, DATEADD(QQ, DATEDIFF(QQ, 0, @CurrentDate), 0), @CurrentDate) / 7) + 1 AS WeekOfQuarter,&#xA;        DATEPART(WW, @CurrentDate) AS WeekOfYear,&#xA;        DATEPART(MM, @CurrentDate) AS Month,&#xA;        DATENAME(MM, @CurrentDate) AS MonthName,&#xA;        CASE&#xA;            WHEN DATEPART(MM, @CurrentDate) IN (1, 4, 7, 10) THEN 1&#xA;            WHEN DATEPART(MM, @CurrentDate) IN (2, 5, 8, 11) THEN 2&#xA;            WHEN DATEPART(MM, @CurrentDate) IN (3, 6, 9, 12) THEN 3&#xA;            END AS MonthOfQuarter,&#xA;        DATEPART(QQ, @CurrentDate) AS Quarter,&#xA;        CASE DATEPART(QQ, @CurrentDate)&#xA;            WHEN 1 THEN 'First'&#xA;            WHEN 2 THEN 'Second'&#xA;            WHEN 3 THEN 'Third'&#xA;            WHEN 4 THEN 'Fourth'&#xA;            END AS QuarterName,&#xA;        DATEPART(YEAR, @CurrentDate) AS Year,&#xA;        'CY ' + CONVERT(VARCHAR, DATEPART(YEAR, @CurrentDate)) AS YearName,&#xA;        LEFT(DATENAME(MM, @CurrentDate), 3) + '-' + CONVERT(VARCHAR, DATEPART(YY, @CurrentDate)) AS MonthYear,&#xA;        RIGHT('0' + CONVERT(VARCHAR, DATEPART(MM, @CurrentDate)),2) + CONVERT(VARCHAR, DATEPART(YY, @CurrentDate)) AS MMYYYY,&#xA;        CONVERT(DATETIME, CONVERT(DATE, DATEADD(DD, - (DATEPART(DD, @CurrentDate) - 1), @CurrentDate))) AS FirstDayOfMonth,&#xA;        CONVERT(DATETIME, CONVERT(DATE, DATEADD(DD, - (DATEPART(DD, (DATEADD(MM, 1, @CurrentDate)))), DATEADD(MM, 1, @CurrentDate)))) AS LastDayOfMonth,&#xA;        DATEADD(QQ, DATEDIFF(QQ, 0, @CurrentDate), 0) AS FirstDayOfQuarter,&#xA;        DATEADD(QQ, DATEDIFF(QQ, -1, @CurrentDate), -1) AS LastDayOfQuarter,&#xA;        CONVERT(DATETIME, '01/01/' + CONVERT(VARCHAR, DATEPART(YY, @CurrentDate))) AS FirstDayOfYear,&#xA;        CONVERT(DATETIME, '12/31/' + CONVERT(VARCHAR, DATEPART(YY, @CurrentDate))) AS LastDayOfYear,&#xA;        NULL AS IsHolidayUSA,&#xA;        CASE DATEPART(DW, @CurrentDate)&#xA;            WHEN 1 THEN 0&#xA;            WHEN 2 THEN 1&#xA;            WHEN 3 THEN 1&#xA;            WHEN 4 THEN 1&#xA;            WHEN 5 THEN 1&#xA;            WHEN 6 THEN 1&#xA;            WHEN 7 THEN 0&#xA;            END AS IsWeekday,&#xA;        NULL AS HolidayUSA, Null, Null&#xA;&#xA;    SET @CurrentDate = DATEADD(DD, 1, @CurrentDate)&#xA;END&#xA;&#xA;&#xA;&#xA;&#xA;/* Add HOLIDAYS UK */&#xA;/* For Easter, you should do this for every year INDIVIDUALLY */&#xA;/* For now we assume that these dates are always on the same date */&#xA;&#xA;-- Good Friday  April 18&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUK = 'Good Friday'&#xA;    WHERE [Month] = 4 AND [DayOfMonth]  = 18&#xA;-- Easter Monday  April 21&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUK = 'Easter Monday'&#xA;    WHERE [Month] = 4 AND [DayOfMonth]  = 21&#xA;-- Early May Bank Holiday   May 5&#xA;   UPDATE [dbo].[DimDate]&#xA;        SET HolidayUK = 'Early May Bank Holiday'&#xA;    WHERE [Month] = 5 AND [DayOfMonth]  = 5&#xA;-- Spring Bank Holiday  May 26&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUK = 'Spring Bank Holiday'&#xA;    WHERE [Month] = 5 AND [DayOfMonth]  = 26&#xA;-- Summer Bank Holiday  August 25&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUK = 'Summer Bank Holiday'&#xA;    WHERE [Month] = 8 AND [DayOfMonth]  = 25&#xA;-- Boxing Day  December 26&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUK = 'Boxing Day'&#xA;    WHERE [Month] = 12 AND [DayOfMonth]  = 26&#xA;--CHRISTMAS&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUK = 'Christmas Day'&#xA;    WHERE [Month] = 12 AND [DayOfMonth]  = 25&#xA;--New Years Day&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUK  = 'New Year''s Day'&#xA;    WHERE [Month] = 1 AND [DayOfMonth] = 1&#xA;&#xA;    UPDATE [dbo].[DimDate]&#xA;    SET IsHolidayUK = CASE WHEN HolidayUK IS NULL THEN 0 WHEN HolidayUK IS NOT NULL THEN 1 END&#xA;&#xA;&#xA;    /*Add HOLIDAYS USA*/&#xA;    /*THANKSGIVING - Fourth THURSDAY in November*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Thanksgiving Day'&#xA;    WHERE&#xA;        [Month] = 11&#xA;        AND [DayOfWeekUSA] = 'Thursday'&#xA;        AND DayOfWeekInMonth = 4&#xA;&#xA;    /*CHRISTMAS*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Christmas Day'&#xA;&#xA;    WHERE [Month] = 12 AND [DayOfMonth]  = 25&#xA;&#xA;    /*4th of July*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Independance Day'&#xA;    WHERE [Month] = 7 AND [DayOfMonth] = 4&#xA;&#xA;    /*New Years Day*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'New Year''s Day'&#xA;    WHERE [Month] = 1 AND [DayOfMonth] = 1&#xA;&#xA;    /*Memorial Day - Last Monday in May*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Memorial Day'&#xA;    FROM [dbo].[DimDate]&#xA;    WHERE DateKey IN&#xA;        (&#xA;        SELECT&#xA;            MAX(DateKey)&#xA;        FROM [dbo].[DimDate]&#xA;        WHERE&#xA;            [MonthName] = 'May'&#xA;            AND [DayOfWeekUSA]  = 'Monday'&#xA;        GROUP BY&#xA;            [Year],&#xA;            [Month]&#xA;        )&#xA;&#xA;    /*Labor Day - First Monday in September*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Labor Day'&#xA;    FROM [dbo].[DimDate]&#xA;    WHERE DateKey IN&#xA;        (&#xA;        SELECT&#xA;            MIN(DateKey)&#xA;        FROM [dbo].[DimDate]&#xA;        WHERE&#xA;            [MonthName] = 'September'&#xA;            AND [DayOfWeekUSA] = 'Monday'&#xA;        GROUP BY&#xA;            [Year],&#xA;            [Month]&#xA;        )&#xA;&#xA;    /*Valentine's Day*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Valentine''s Day'&#xA;    WHERE&#xA;        [Month] = 2&#xA;        AND [DayOfMonth] = 14&#xA;&#xA;    /*Saint Patrick's Day*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Saint Patrick''s Day'&#xA;    WHERE&#xA;        [Month] = 3&#xA;        AND [DayOfMonth] = 17&#xA;&#xA;    /*Martin Luthor King Day - Third Monday in January starting in 1983*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Martin Luthor King Jr Day'&#xA;    WHERE&#xA;        [Month] = 1&#xA;        AND [DayOfWeekUSA]  = 'Monday'&#xA;        AND [Year] &gt;= 1983&#xA;        AND DayOfWeekInMonth = 3&#xA;&#xA;    /*President's Day - Third Monday in February*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'President''s Day'&#xA;    WHERE&#xA;        [Month] = 2&#xA;        AND [DayOfWeekUSA] = 'Monday'&#xA;        AND DayOfWeekInMonth = 3&#xA;&#xA;    /*Mother's Day - Second Sunday of May*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Mother''s Day'&#xA;    WHERE&#xA;        [Month] = 5&#xA;        AND [DayOfWeekUSA] = 'Sunday'&#xA;        AND DayOfWeekInMonth = 2&#xA;&#xA;    /*Father's Day - Third Sunday of June*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Father''s Day'&#xA;    WHERE&#xA;        [Month] = 6&#xA;        AND [DayOfWeekUSA] = 'Sunday'&#xA;        AND DayOfWeekInMonth = 3&#xA;&#xA;    /*Halloween 10/31*/&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET HolidayUSA = 'Halloween'&#xA;    WHERE&#xA;        [Month] = 10&#xA;        AND [DayOfMonth] = 31&#xA;&#xA;    /*Election Day - The first Tuesday after the first Monday in November*/&#xA;    BEGIN&#xA;        DECLARE @Holidays TABLE (ID INT IDENTITY(1,1), DateID INT, Week TINYINT, YEAR CHAR(4), DAY CHAR(2))&#xA;&#xA;        INSERT INTO @Holidays(DateID, [Year],[Day])&#xA;        SELECT&#xA;            DateKey,&#xA;            [Year],&#xA;            [DayOfMonth]&#xA;        FROM [dbo].[DimDate]&#xA;        WHERE&#xA;            [Month] = 11&#xA;            AND [DayOfWeekUSA] = 'Monday'&#xA;        ORDER BY&#xA;            YEAR,&#xA;            DayOfMonth&#xA;&#xA;        DECLARE @CNTR INT, @POS INT, @STARTYEAR INT, @ENDYEAR INT, @MINDAY INT&#xA;&#xA;        SELECT&#xA;            @CURRENTYEAR = MIN([Year])&#xA;            , @STARTYEAR = MIN([Year])&#xA;            , @ENDYEAR = MAX([Year])&#xA;        FROM @Holidays&#xA;&#xA;        WHILE @CURRENTYEAR &lt;= @ENDYEAR&#xA;        BEGIN&#xA;            SELECT @CNTR = COUNT([Year])&#xA;            FROM @Holidays&#xA;            WHERE [Year] = @CURRENTYEAR&#xA;&#xA;            SET @POS = 1&#xA;&#xA;            WHILE @POS &lt;= @CNTR&#xA;            BEGIN&#xA;                SELECT @MINDAY = MIN(DAY)&#xA;                FROM @Holidays&#xA;                WHERE&#xA;                    [Year] = @CURRENTYEAR&#xA;                    AND [Week] IS NULL&#xA;&#xA;                UPDATE @Holidays&#xA;                    SET [Week] = @POS&#xA;                WHERE&#xA;                    [Year] = @CURRENTYEAR&#xA;                    AND [Day] = @MINDAY&#xA;&#xA;                SELECT @POS = @POS + 1&#xA;            END&#xA;&#xA;            SELECT @CURRENTYEAR = @CURRENTYEAR + 1&#xA;        END&#xA;&#xA;        UPDATE [dbo].[DimDate]&#xA;            SET HolidayUSA  = 'Election Day'&#xA;        FROM [dbo].[DimDate] DT&#xA;            JOIN @Holidays HL ON (HL.DateID + 1) = DT.DateKey&#xA;        WHERE&#xA;            [Week] = 1&#xA;    END&#xA;&#xA;    UPDATE [dbo].[DimDate]&#xA;        SET IsHolidayUSA = CASE WHEN HolidayUSA  IS NULL THEN 0 WHEN HolidayUSA  IS NOT NULL THEN 1 END&#xA;&#xA;/*******************************************************************************************************************************************************/&#xA;&#xA;&#xA;-- SELECT * FROM DimDate&#xA;&#xA;&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Load Data"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{3e0a4f8c-c498-49de-b2e0-692f11a2517e}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load Data"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2022; © 2022 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{E6FF6A1A-AE3E-4FA4-83E1-ECD94A6BDE65}"
+          SQLTask:SqlStatementSource="&#xA;&#xA;USE ChinookDW&#xA;&#xA;---- Only for the first load&#xA;TRUNCATE TABLE FactInvoiceLine;&#xA;TRUNCATE TABLE Bridge ;&#xA;TRUNCATE TABLE DimTrack;&#xA;TRUNCATE TABLE DimPlaylist;&#xA;TRUNCATE TABLE DimCustomer;&#xA;TRUNCATE TABLE DimEmployee;&#xA;&#xA;&#xA;--===================================================&#xA;-- Dimension Employee&#xA;-----------------------------&#xA;INSERT INTO DimEmployee (EmployeeID, LastName, FirstName, EmployeeTitle, ReportsTo, BirthDate, HireDate, EmployeeAddress, EmployeeCity, EmployeeCountry, EmployeeState, &#xA;&#x9;Employee_PostalCode, Employee_Phone, Employee_Fax, Employee_Mail)&#xA;SELECT EmployeeId,&#xA;&#x9;   LastName,&#xA;&#x9;   FirstName,&#xA;&#x9;   Title,  ----&gt; EmployeeTitle&#xA;&#x9;   ReportsTo,&#xA;&#x9;   BirthDate,&#xA;&#x9;   HireDate,&#xA;&#x9;   Address,  ----&gt; EmployeeAddress&#xA;&#x9;   City,  ----&gt; EmployeeCity&#xA;&#x9;   Country, ----&gt; EmployeeCoutry&#xA;&#x9;   State, ----&gt; EmployeeState&#xA;&#x9;   PostalCode, ----&gt; Employee_PostalCode&#xA;&#x9;   Phone, ----&gt; Employee_Phone&#xA;&#x9;   Fax, ----&gt; Employee_Fax&#xA;&#x9;   Email ----&gt; Employee_Mail&#xA;FROM ChinookStaging.dbo.Employee&#xA;&#xA;&#xA;--===================================================&#xA;-- Dimension Customer&#xA;-----------------------------&#xA;INSERT INTO DimCustomer(CustomerID, LastName, FirstName, Company, CustomerAddress, City, CustomerState, CustomerCountry, CustomerPostalCode, CustomerPhone, CustomerFax, &#xA;&#x9;CustomerEmail, SupportedByEmployee, EmployeeFullName,  EmployeeTitle, ReportsTo)&#xA;SELECT CustomerID,&#xA;&#x9;   LastName, &#xA;&#x9;   FirstName, &#xA;&#x9;   Company, &#xA;&#x9;   Address, ----&gt; CustomerAddress &#xA;&#x9;   City, ----&gt; CustomerCity&#xA;&#x9;   State, ----&gt; CustomerState&#xA;&#x9;   Country, ----&gt; CustomerCountry&#xA;&#x9;   PostalCode, ----&gt; CustomerPostalCode&#xA;&#x9;   Phone, ----&gt; CustomerPhone&#xA;&#x9;   Fax, ----&gt; CustomerFax&#xA;&#x9;   Email, ----&gt; CustomerEmail&#xA;&#x9;   SupportRepId,  ----&gt; SupportedByEmployee&#xA;&#x9;   EmployeeFullName, &#xA;&#x9;   Title, ----&gt; EmployeeTitle&#xA;&#x9;   ReportsTo&#xA;FROM ChinookStaging.dbo.Customer&#xA;&#xA;&#xA;--===================================================&#xA;-- Dimension Track&#xA;-----------------------------&#xA;INSERT INTO DimTrack(TrackId, TrackName, Composer, Milliseconds, Bytes, UnitPrice, AlbumId, AlbumTitle, Artist_Id, ArtistName, MediaTypeId, MediaTypeName,&#xA;&#x9;GenreId, GenreName)&#xA;SELECT TrackId,&#xA;&#x9;   Name, ----&gt; TrackName&#xA;&#x9;   Composer,&#xA;&#x9;   Milliseconds,&#xA;&#x9;   Bytes, &#xA;&#x9;   UnitPrice,&#xA;&#x9;   AlbumId,&#xA;&#x9;   AlbumTitle,&#xA;&#x9;   ArtistId, &#xA;&#x9;   ArtistName, &#xA;&#x9;   MediaTypeId,&#xA;&#x9;   MediaTypeName,&#xA;&#x9;   GenreId,&#xA;&#x9;   GenreName&#xA;FROM ChinookStaging.dbo.Track&#xA;&#xA;&#xA;--===============================================&#xA;-- Dimension Playlist&#xA;-----------------------------&#xA;INSERT INTO DimPlaylist(PlaylistName)&#xA;SELECT &#xA;&#x9;   Name ----&gt; PlaylistName&#xA;FROM ChinookStaging.dbo.Playlist&#xA;&#xA;&#xA;--===================================================&#xA;-- Bridge&#xA;-----------------------------&#xA;INSERT INTO Bridge(TrackId, PlaylistId)&#xA;SELECT TrackId, &#xA;&#x9;   PlaylistId&#xA;FROM ChinookStaging.dbo.PlaylistTrackBridge&#xA;&#xA;&#xA;--===================================================&#xA;-- Fact Invoice Line&#xA;-----------------------------&#xA;/* We need to note here the usage of the aggregate function max combined with the group by clause. The resons is that we have a many to many&#xA;relationship in our database and when we load data from invoiceLine to the fact, same rows with only one different value in the keys occur. &#xA;For example if a track (in which is connected an invoice) belongs to 3 playlists, we are going to have in the fact 3 same rows with &#xA;different values in the PlaylistKey, which is not good practice. So we minimize this problem by using the aggregate function MAX() ( we &#xA;could also use MIN() ). */&#xA;&#xA;INSERT INTO FactInvoiceLine( Date_Key, Track_Key, Employee_Key, Customer_Key, InvoiceLine_Id, Invoice_Id, TrackId, Quantity, UnitPrice, &#xA;&#x9;                         CustomerId, InvoiceDate, BillingAddress, BillingCity, BillingState, BillingCountry, BillingPostalCode, Total )&#xA;SELECT d.DateKey,&#xA;&#x9;   Track_Key,&#xA;&#x9;   Employee_Key,&#xA;&#x9;   Customer_Key, &#xA;&#x9;   InvoiceLineId, &#xA;&#x9;   il.InvoiceId, &#xA;&#x9;   il.TrackId, &#xA;&#x9;   Quantity, &#xA;&#x9;   il.UnitPrice, &#xA;&#x9;   il.CustomerId,&#xA;&#x9;   il.InvoiceDate,&#xA;&#x9;   il.BillingAddress,&#xA;&#x9;   il.BillingCity, &#xA;&#x9;   il.BillingState,&#xA;&#x9;   il.BillingCountry, &#xA;&#x9;   il.BillingPostalCode,&#xA;&#x9;   il.Total&#xA;FROM ChinookStaging.dbo.InvoiceLine AS il&#xA;INNER JOIN ChinookDW.dbo.DimCustomer AS c&#xA;&#x9;ON c.CustomerId = il.CustomerId&#xA;INNER JOIN ChinookDW.dbo.DimEmployee as e&#xA;&#x9;ON e.EmployeeId = c.SupportedByEmployee&#xA;INNER JOIN ChinookDW.dbo.DimDate as d&#xA;&#x9;ON d.Date = il.InvoiceDate&#xA;INNER JOIN ChinookDW.dbo.DimTrack as t&#xA;&#x9;ON t.TrackId = il.TrackId&#xA;--INNER JOIN Bridge b&#xA;--&#x9;ON b.TrackId = il.TrackId&#xA;--INNER JOIN ChinookDW.dbo.DimPlaylist as p&#xA;--&#x9;ON p.PlaylistId = b.PlaylistId&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Staging Area"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{f2770214-16d5-4938-90d4-da610df7f4ef}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Staging Area"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2022; © 2022 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{E6FF6A1A-AE3E-4FA4-83E1-ECD94A6BDE65}"
+          SQLTask:SqlStatementSource="&#xA;IF EXISTS (SELECT name FROM sys.databases WHERE name = 'ChinookStaging')&#xA;BEGIN&#xA;    DROP DATABASE ChinookStaging;&#xA;END&#xA;&#xA;CREATE DATABASE ChinookStaging&#xA;GO&#xA;&#xA;USE ChinookStaging&#xA;GO&#xA;&#xA;-- Delete the tables from our base ( staging )&#xA;DROP TABLE IF EXISTS ChinookStaging.dbo.Employee;&#xA;DROP TABLE IF EXISTS ChinookStaging.dbo.Customer;&#xA;DROP TABLE IF EXISTS ChinookStaging.dbo.InvoiceLine;&#xA;DROP TABLE IF EXISTS ChinookStaging.dbo.Playlist;&#xA;DROP TABLE IF EXISTS ChinookStaging.dbo.Track;&#xA;DROP TABLE IF EXISTS ChinookStaging.dbo.DimDate;&#xA;DROP TABLE IF EXISTS ChinookStaging.dbo.PlaylistTrackBridge;&#xA;&#xA;--=======================================================================================================================================--&#xA;--                                                             Cloning                                                                   --&#xA;--=======================================================================================================================================--&#xA;&#xA;-------------------------------------------------------------- Bridge --------------------------------------------------------------------&#xA;/* This is the PlaylistTrack table. We observed that in reality it works as an intermediate (bridge) table in the original data base, to&#xA;handle the many-to-many relationship between track and playlist. So we are going to clone it to the staging area as well, to handle the &#xA;problem there too. */&#xA;&#xA;SELECT Chinook.dbo.PlaylistTrack.*&#xA;INTO PlaylistTrackBridge&#xA;FROM Chinook.dbo.PlaylistTrack&#xA;&#xA;-------------------------------------------------------------------------------------------------------------------------------------------&#xA;---------------------------------------------------------- PLAYLIST TABLE -----------------------------------------------------------------&#xA;/* We just copy the playlist table from the OLTP to the new table named Playlist as well to the staging intermediate area                */&#xA;&#xA;SELECT Chinook.[dbo].Playlist.*&#xA;INTO ChinookStaging.[dbo].Playlist&#xA;FROM Chinook.[dbo].Playlist&#xA;&#xA;--------------------------------------------------------------------------------------------------------------------------------------------&#xA;------------------------------------------------------------ TRACK TABLE -------------------------------------------------------------------&#xA;/* We want to create one table that has every track related ( genre, album, artist, ...) tables ( except the playlist). So we are going to &#xA;join Album and Artist, and then join those with Track. We also are going to join genre and media type with track. Keep in mind that due to &#xA;the many-to-many relationship between Track and playlist, we are not going to join those tables here.*/&#xA;&#xA;SELECT Chinook.[dbo].Track.*, &#xA;&#x9;   Chinook.[dbo].Genre.Name AS GenreName,&#xA;&#x9;   Chinook.[dbo].MediaType.Name AS MediaTypeName,&#xA;&#x9;   Chinook.[dbo].Album.Title AS AlbumTitle,&#xA;&#x9;   Chinook.[dbo].Album.ArtistId,&#xA;&#x9;   Chinook.[dbo].Artist.Name AS ArtistName&#xA;INTO ChinookStaging.[dbo].Track&#xA;FROM Chinook.[dbo].Track&#xA;INNER JOIN Chinook.[dbo].Genre&#xA;&#x9;ON Chinook.dbo.Genre.GenreId = Chinook.dbo.Track.GenreId&#xA;INNER JOIN Chinook.dbo.MediaType&#xA;&#x9;ON Chinook.dbo.MediaType.MediaTypeId = Chinook.dbo.Track.MediaTypeId&#xA;INNER JOIN Chinook.dbo.Album&#xA;&#x9;ON Chinook.dbo.Album.AlbumId = Chinook.dbo.Track.AlbumId&#xA;INNER JOIN Chinook.[dbo].[Artist]&#xA;&#x9;ON Chinook.[dbo].[Artist].ArtistId = Chinook.[dbo].[Album].[ArtistId]&#xA;&#xA;--------------------------------------------------------------------------------------------------------------------------------------------------&#xA;------------------------------------------------------------ Invoice Line TABLE ------------------------------------------------------------------&#xA;/* For this table we are going to join Invoice Line with Invoice. The reason is that we want to create at the end a star scheme, and at the same &#xA;time we want to have a table of Employee ( not to put it in one with the customers ). So, We aimto have a table (InvoiceLine-Invoice) as the fact, &#xA;and the dimensions employee, customer, track, date and playlist. */&#xA;&#xA;SELECT il.*,&#xA;&#x9;   i.CustomerId,&#xA;&#x9;   i.InvoiceDate,&#xA;&#x9;   i.BillingAddress,&#xA;&#x9;   i.BillingCity,&#xA;&#x9;   i.BillingState,&#xA;&#x9;   i.BillingCountry,&#xA;&#x9;   i.BillingPostalCode,&#xA;&#x9;   i.Total&#xA;INTO ChinookStaging.[dbo].InvoiceLine&#xA;FROM Chinook.[dbo].InvoiceLine il&#xA;INNER JOIN Chinook.[dbo].Invoice i&#xA;&#x9;ON i.InvoiceId = il.InvoiceId &#xA;&#xA;-----------------------------------------------------------------------------------------------------------------------------------------------&#xA;------------------------------------------------------------ Customer TABLE -------------------------------------------------------------------&#xA;/* We will join here the Employee table with the Customer, so you can gain information ( except Customers ) about the Most succesful employee &#xA;through the sales and all his information as well. The reason we added all the information of an Employee, is for your ease. You can gain every &#xA;information of the Employee who helped a specific or more customers by just access Customer Table. */&#xA;&#xA;SELECT Chinook.[dbo].Customer.*,&#xA;&#x9;   Chinook.[dbo].Employee.LastName + ' ' + Chinook.[dbo].Employee.FirstName AS EmployeeFullName,&#xA;&#x9;   Chinook.[dbo].Employee.Title,&#xA;&#x9;   Chinook.[dbo].Employee.ReportsTo&#xA;INTO ChinookStaging.[dbo].Customer&#xA;FROM Chinook.[dbo].Customer&#xA;INNER JOIN Chinook.[dbo].Employee&#xA;&#x9;ON Chinook.[dbo].Employee.EmployeeId = Chinook.[dbo].[Customer].SupportRepId&#xA;&#xA;-----------------------------------------------------------------------------------------------------------------------------------------------&#xA;------------------------------------------------------------ Employee TABLE -------------------------------------------------------------------&#xA;/* As we said previously we included the table Employee, because you need to have access to all your Employees, even if they didn't have &#xA;any connection with your customers. So if you want to, make any update to your Employees ( add, delete, update ) you access this table. Remember&#xA;that here are all the Employees of the company ( so not everyone can be found in the customer table ).*/&#xA;&#xA;SELECT Chinook.[dbo].Employee.*&#xA;INTO ChinookStaging.[dbo].Employee&#xA;FROM Chinook.[dbo].Employee&#xA;&#xA;&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint]"
+      DTS:CreationName=""
+      DTS:DTSID="{d309bd2a-46fc-44eb-a5ef-8f393c7e9edb}"
+      DTS:From="Package\Staging Area"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint"
+      DTS:To="Package\Data Warehouse"
+      DTS:Value="2" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 1]"
+      DTS:CreationName=""
+      DTS:DTSID="{5D146C7B-CF6D-4072-9A5D-96F7AC617FD9}"
+      DTS:From="Package\Data Warehouse"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 1"
+      DTS:To="Package\Date Dimension"
+      DTS:Value="2" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 2]"
+      DTS:CreationName=""
+      DTS:DTSID="{40E256DD-FC3E-4D99-9EB3-35F286B4C5D3}"
+      DTS:From="Package\Date Dimension"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 2"
+      DTS:To="Package\Load Data"
+      DTS:Value="2" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 3]"
+      DTS:CreationName=""
+      DTS:DTSID="{E7BCB432-5378-4DA4-8E6C-685D16E2B9BD}"
+      DTS:From="Package\Load Data"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 3"
+      DTS:To="Package\Constraints"
+      DTS:Value="2" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        <NodeLayout
+          Size="131,42"
+          Id="Package\Constraints"
+          TopLeft="184.000000031931,367.705882092867" />
+        <NodeLayout
+          Size="157,42"
+          Id="Package\Data Warehouse"
+          TopLeft="167.714285715806,106.294117565283" />
+        <NodeLayout
+          Size="153,42"
+          Id="Package\Date Dimension"
+          TopLeft="170,186.294117474123" />
+        <NodeLayout
+          Size="127,42"
+          Id="Package\Load Data"
+          TopLeft="184,279" />
+        <NodeLayout
+          Size="139,42"
+          Id="Package\Staging Area"
+          TopLeft="175.571428589675,24" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="245.642857152741,66">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,40.294117565283"
+              Start="0,0"
+              End="0,32.794117565283">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,32.794117565283" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-25.304453125,10.5923712826415,50.60890625,11.609375"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 1]"
+          TopLeft="246.357142857903,148.294117565283">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,37.99999990884"
+              Start="0,0"
+              End="0,30.49999990884">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,30.49999990884" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-25.304453125,9.44531245442002,50.60890625,11.609375"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 2]"
+          TopLeft="247,228.294117474123">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,50.705882525877"
+              Start="0,0"
+              End="0,43.205882525877">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,43.205882525877" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-25.304453125,15.7982537629385,50.60890625,11.609375"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 3]"
+          TopLeft="247.500000015965,321">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,46.705882092867"
+              Start="0,0"
+              End="0,39.205882092867">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,39.205882092867" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-25.304453125,13.7982535464335,50.60890625,11.609375"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>
